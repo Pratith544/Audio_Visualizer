@@ -87,10 +87,10 @@ export default function ControlDial({
     }
   };
 
-  // Calculate volume arc length (270 degrees = 75% of circle)
-  const radius = 115; // 45% of 256 (the viewBox)
+      
+  const radius = 115; 
   const circumference = 2 * Math.PI * radius;
-  const arcLength = (circumference * 0.75) * volume; // 75% = 270 degrees
+  const arcLength = (circumference * 0.75) * volume; 
 
   return (
     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10">
@@ -126,7 +126,7 @@ export default function ControlDial({
             }}
           />
           
-          {/* Background track */}
+          
           <circle
             cx="128"
             cy="128"
@@ -138,7 +138,7 @@ export default function ControlDial({
             style={{ pointerEvents: 'none' }}
           />
           
-          {/* Volume indicator arc */}
+          
           <circle
             cx="128"
             cy="128"
@@ -154,7 +154,7 @@ export default function ControlDial({
             }}
           />
           
-          {/* Volume indicator dot */}
+          
           {(() => {
             const angle = (volume * 270) * (Math.PI / 180);
             const dotX = 128 + radius * Math.cos(angle);
@@ -191,7 +191,7 @@ export default function ControlDial({
           </defs>
         </motion.svg>
 
-        {/* Volume percentage display */}
+            
         <div className="absolute top-9 left-1/2 -translate-x-1/2 text-cyan-300 text-sm font-semibold" style={{ zIndex: 5 }}>
           <motion.div
             animate={{ opacity: [0.7, 1, 0.7] }}

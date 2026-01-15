@@ -62,11 +62,11 @@ export default function RadialBars({ frequencyData, radius, barCount, preset }: 
     
     
     if (preset === 'bassBoost' && ratio < 0.3) {
-      return `rgba(168, 85, 247, ${0.8 + intensity * 0.2})`; // More purple for bass
+      return `rgba(168, 85, 247, ${0.8 + intensity * 0.2})`; 
     }
     
     if (preset === 'vocal' && ratio > 0.3 && ratio < 0.7) {
-      return `rgba(34, 211, 238, ${0.8 + intensity * 0.2})`; // More cyan for vocals
+      return `rgba(34, 211, 238, ${0.8 + intensity * 0.2})`; 
     }
     
     

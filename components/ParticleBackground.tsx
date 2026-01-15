@@ -13,7 +13,6 @@ export default function ParticleBackground() {
     const gl = canvas.getContext('webgl', { alpha: true, antialias: true });
     if (!gl) return;
 
-    // Set canvas size
     const resize = () => {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
@@ -64,7 +63,6 @@ export default function ParticleBackground() {
       }
     `;
 
-    // Fragment shader
     const fragmentShaderSource = `
       precision mediump float;
       
@@ -78,7 +76,6 @@ export default function ParticleBackground() {
       }
     `;
 
-    // Compile shader
     const compileShader = (source: string, type: number) => {
       const shader = gl.createShader(type);
       if (!shader) return null;
@@ -96,7 +93,6 @@ export default function ParticleBackground() {
     const fragmentShader = compileShader(fragmentShaderSource, gl.FRAGMENT_SHADER);
     if (!vertexShader || !fragmentShader) return;
 
-    // Create program
     const program = gl.createProgram();
     if (!program) return;
     gl.attachShader(program, vertexShader);
@@ -109,7 +105,6 @@ export default function ParticleBackground() {
 
     gl.useProgram(program);
 
-    // Get attribute/uniform locations
     const positionLocation = gl.getAttribLocation(program, 'a_position');
     const sizeLocation = gl.getAttribLocation(program, 'a_size');
     const colorLocation = gl.getAttribLocation(program, 'a_color');
@@ -118,7 +113,6 @@ export default function ParticleBackground() {
     const timeLocation = gl.getUniformLocation(program, 'u_time');
     const mouseLocation = gl.getUniformLocation(program, 'u_mouse');
 
-    // Create particles
     const particleCount = 500;
     const positions = new Float32Array(particleCount * 2);
     const sizes = new Float32Array(particleCount);
@@ -126,30 +120,30 @@ export default function ParticleBackground() {
     const alphas = new Float32Array(particleCount);
 
     const colorPalette = [
-      [34, 211, 238],   // cyan
-      [168, 85, 247],   // purple
-      [255, 255, 255],  // white
+      [34, 211, 238],   
+      [168, 85, 247],   
+      [255, 255, 255],  
     ];
 
     for (let i = 0; i < particleCount; i++) {
-      // Random positions
+      
       positions[i * 2] = (Math.random() - 0.5) * canvas.width * 2;
       positions[i * 2 + 1] = (Math.random() - 0.5) * canvas.height * 2;
       
-      // Random sizes (2-6px)
+      
       sizes[i] = 2 + Math.random() * 4;
       
-      // Random color from palette
+      
       const color = colorPalette[Math.floor(Math.random() * colorPalette.length)];
       colors[i * 3] = color[0] / 255;
       colors[i * 3 + 1] = color[1] / 255;
       colors[i * 3 + 2] = color[2] / 255;
       
-      // Low opacity
+
       alphas[i] = 0.1 + Math.random() * 0.2;
     }
 
-    // Create buffers
+    
     const positionBuffer = gl.createBuffer();
     const sizeBuffer = gl.createBuffer();
     const colorBuffer = gl.createBuffer();
@@ -165,17 +159,15 @@ export default function ParticleBackground() {
     };
     window.addEventListener('mousemove', handleMouseMove);
 
-    // Animation
+    
     let time = 0;
     const animate = () => {
-      time += 0.016; // ~60fps
+      time += 0.016; 
 
-      // Update particle positions (slow floating)
       for (let i = 0; i < particleCount; i++) {
         positions[i * 2] += Math.sin(time + i) * 0.2;
         positions[i * 2 + 1] += Math.cos(time + i * 0.5) * 0.2;
         
-        // Wrap around
         if (Math.abs(positions[i * 2]) > canvas.width) {
           positions[i * 2] = -canvas.width * Math.sign(positions[i * 2]);
         }
@@ -184,15 +176,13 @@ export default function ParticleBackground() {
         }
       }
 
-      // Clear
+      
       gl.clearColor(0, 0, 0, 0);
       gl.clear(gl.COLOR_BUFFER_BIT);
 
-      // Enable blending
       gl.enable(gl.BLEND);
       gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-      // Update buffers
       gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
       gl.bufferData(gl.ARRAY_BUFFER, positions, gl.DYNAMIC_DRAW);
       gl.enableVertexAttribArray(positionLocation);

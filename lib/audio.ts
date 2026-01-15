@@ -107,9 +107,10 @@ export class AudioManager {
     }
   }
 
-  resume() {
-    if (this.audioContext && this.audioContext.state === 'suspended') {
-      this.audioContext.resume();
+  async resume(): Promise<void> {
+    if (!this.audioContext) return;
+    if (this.audioContext.state === 'suspended') {
+      await this.audioContext.resume();
     }
   }
 

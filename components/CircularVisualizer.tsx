@@ -54,26 +54,34 @@ export default function CircularVisualizer() {
     };
   }, [isPlaying, isMicActive, animate]);
 
-  const handlePlayPause = () => {
+  const handlePlayPause = async () => {
     if (!audioRef.current || !audioUrl) return;
 
     if (isMicActive) {
       handleMicToggle();
     }
 
+    // Initialize AudioManager once
+    if (!audioManagerRef.current) {
+      audioManagerRef.current = new AudioManager();
+      audioManagerRef.current.initialize(audioRef.current);
+      audioManagerRef.current.setVolume(volume);
+      audioManagerRef.current.applyPreset(preset);
+    }
+
     if (isPlaying) {
       audioRef.current.pause();
-    } else {
-      if (!audioManagerRef.current) {
-        audioManagerRef.current = new AudioManager();
-        audioManagerRef.current.initialize(audioRef.current);
-        audioManagerRef.current.setVolume(volume);
-        audioManagerRef.current.applyPreset(preset);
-      }
-      audioManagerRef.current.resume();
-      audioRef.current.play();
+      setIsPlaying(false);
+      return;
     }
-    setIsPlaying(!isPlaying);
+
+    try {
+      await audioManagerRef.current.resume();
+      await audioRef.current.play();
+      setIsPlaying(true);
+    } catch (err) {
+      console.error('Playback blocked by browser policy', err);
+    }
   };
 
   const handleVolumeChange = (newVolume: number) => {
@@ -187,11 +195,11 @@ export default function CircularVisualizer() {
   };
 
   const avgFrequency = frequencyData.reduce((a, b) => a + b, 0) / frequencyData.length;
-  const beatAmplitude = Math.max(...frequencyData); // Use peak frequency for beat detection
+  const beatAmplitude = Math.max(...frequencyData); 
 
   return (
     <div className="relative w-full h-screen flex items-center justify-center overflow-hidden">
-      {/* Enhanced background with noise texture */}
+   
       <div 
         className="absolute inset-0"
         style={{
@@ -204,7 +212,7 @@ export default function CircularVisualizer() {
         }}
       />
       
-      {/* Noise texture overlay */}
+      
       <div 
         className="absolute inset-0 opacity-30"
         style={{
@@ -222,7 +230,7 @@ export default function CircularVisualizer() {
         }}
       />
       
-      {/* Radial glow behind center visualizer */}
+  
       <motion.div
         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
         style={{
@@ -243,10 +251,10 @@ export default function CircularVisualizer() {
         }}
       />
 
-      {/* WebGL Particle Background */}
+    
       <ParticleBackground />
       
-      {/* Dark gradient overlay above particles */}
+      
       <div 
         className="absolute inset-0"
         style={{
@@ -256,10 +264,10 @@ export default function CircularVisualizer() {
         }}
       />
 
-      <audio ref={audioRef} />
+      <audio ref={audioRef} crossOrigin="anonymous" />
 
       <div className="relative w-full h-full flex items-center justify-center" style={{ zIndex: 2 }}>
-        {/* Multiple concentric rings with different speeds - outer to inner */}
+        
         <NeonRing size={700} intensity={avgFrequency * 0.6} color="purple" animate={isPlaying || isMicActive} rotationSpeed={0.3} opacity={0.2} />
         <NeonRing size={600} intensity={avgFrequency * 0.8} color="purple" animate={isPlaying || isMicActive} rotationSpeed={0.5} opacity={0.25} />
         <NeonRing size={500} intensity={avgFrequency * 1.0} color="cyan" animate={isPlaying || isMicActive} rotationSpeed={0.7} opacity={0.3} />
