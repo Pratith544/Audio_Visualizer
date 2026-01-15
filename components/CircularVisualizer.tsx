@@ -115,23 +115,32 @@ export default function CircularVisualizer() {
       setIsPlaying(false);
     }
 
+    // Upload directly to Cloudinary using an unsigned preset
     const formData = new FormData();
     formData.append('file', file);
+    formData.append('upload_preset', process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET as string);
 
     try {
-      const response = await fetch('/api/upload', {
+      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+      if (!cloudName) {
+        throw new Error('Cloudinary cloud name not configured');
+      }
+      
+      const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/video/upload`, {
         method: 'POST',
         body: formData,
       });
 
       const data = await response.json();
 
-      if (data.success && data.url) {
-        setAudioUrl(data.url);
+      if (data.secure_url) {
+        setAudioUrl(data.secure_url);
         if (audioRef.current) {
-          audioRef.current.src = data.url;
+          audioRef.current.src = data.secure_url;
           audioRef.current.load();
         }
+      } else {
+        throw new Error(data.error?.message || 'Upload failed');
       }
     } catch (error) {
       console.error('Upload failed:', error);
